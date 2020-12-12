@@ -1,13 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace RouteTemplate
+namespace EndpointMatcher
 {
-    public class SubsetRouteMatcher
+    public class SubsetRouteMatcher : ISubsetRouteMatcher
     {
-        public int GetNumberOfLevels(string value)
+        private readonly List<string> routeValues;
+
+        public SubsetRouteMatcher(List<string> routeValues)
         {
-            return value.Count(ch => ch == '/');
+            this.routeValues = routeValues;
+        }
+
+        public int GetNumberOfRouteLevels(string route)
+        {
+            return route.Count(character => character == '/');
         }
 
         public string GetTypeOfSubset(string subsetFromRoute)
@@ -27,37 +35,41 @@ namespace RouteTemplate
             return "string";
         }
 
-        public string GetSubsetMatchedRoute(string route, List<string> values)
+        public string GetSubsetMatchedRoute(string route)
         {
-            string[] strings = route.Split('/');
+            string[] routeSubsets = route.Split('/');
             int index = 1;
             var indexOfSpecificity = -1;
-            var numberOflevels = strings.Length - 1;
-            while (index < strings.Length)
+            var numberOfRouteLevels = routeSubsets.Length - 1;
+
+            while (index < routeSubsets.Length)
             {
-                var typeOfSubset = GetTypeOfSubset(strings[index]);
-                for (int i = 0; i < values.Count; i++)
+                var primitiveTypeOfSubset = GetTypeOfSubset(routeSubsets[index]);
+
+                for (int i = 0; i < routeValues.Count; i++)
                 {
-                    if (GetNumberOfLevels(values[i]) != numberOflevels)
+                    if (GetNumberOfRouteLevels(routeValues[i]) != numberOfRouteLevels)
                     {
-                        values[i] = "-";
+                        routeValues[i] = "-";
                     }
-
-                    if (GetNumberOfLevels(values[i]) == numberOflevels)
+                    else
                     {
-                        var splited = values[i].Split('/')[index];
+                        var routeValueSubset = routeValues[i].Split('/')[index];
 
-                        if (splited.IndexOf('{') < 0 && splited.IndexOf('}') < 0 && splited != strings[index])
+                        if (routeValueSubset.IndexOf("{", 0, StringComparison.Ordinal) < 0
+                            && routeValueSubset.IndexOf("}", 0, StringComparison.Ordinal) < 0
+                            && routeValueSubset != routeSubsets[index])
                         {
-                            values[i] = "-";
+                            routeValues[i] = "-";
                         }
 
-                        if (splited.IndexOf(':') > 0 && !splited.Contains(typeOfSubset))
+                        if (routeValueSubset.IndexOf(":", 0, StringComparison.Ordinal) > 0
+                            && !routeValueSubset.Contains(primitiveTypeOfSubset))
                         {
-                            values[i] = "-";
+                            routeValues[i] = "-";
                         }
 
-                        if (splited.IndexOf(':') > 0 && splited.Contains(typeOfSubset))
+                        if (routeValueSubset.IndexOf(':') > 0 && routeValueSubset.Contains(primitiveTypeOfSubset))
                         {
                             if (indexOfSpecificity == -1)
                             {
@@ -76,10 +88,10 @@ namespace RouteTemplate
 
             if (indexOfSpecificity != -1)
             {
-                return values[indexOfSpecificity];
+                return routeValues[indexOfSpecificity];
             }
 
-            return values.FirstOrDefault(v => v != "-");
+            return routeValues.FirstOrDefault(v => v != "-");
         }
     }
 }

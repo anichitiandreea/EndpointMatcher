@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace RouteTemplate
+namespace EndpointMatcher
 {
-    public class EndpointMatcher
+    public class EndpointMatcher : IEndpointMatcher
     {
-        public Dictionary<string, List<string>> routes = new Dictionary<string, List<string>>();
+        private readonly Dictionary<string, List<string>> routes = new Dictionary<string, List<string>>();
 
         public EndpointMatcher(Dictionary<string, List<string>> routes)
         {
@@ -13,17 +13,17 @@ namespace RouteTemplate
 
         public string Match(string route)
         {
-            routes.TryGetValue(route.Split('/')[0], out List<string> value);
+            routes.TryGetValue(route.Split('/')[0], out List<string> routeSubsets);
 
-            if (value.Contains(route))
+            if (routeSubsets.Contains(route))
             {
                 return route;
             }
 
-            var subsetRouteMatcher = new SubsetRouteMatcher();
-            string result = subsetRouteMatcher.GetSubsetMatchedRoute(route, value);
+            var subsetRouteMatcher = new SubsetRouteMatcher(routeSubsets);
+            string matchedRoute = subsetRouteMatcher.GetSubsetMatchedRoute(route);
 
-            return result;
+            return matchedRoute;
         }
     }
 }
