@@ -69,10 +69,13 @@ namespace EndpointMatcher.Tests
             // Arrange
             Dictionary<string, List<string>> routes = new Dictionary<string, List<string>>
             {
-                { "users", new List<string>()
+                {
+                    "users",
+                    new List<string>()
                     {
                         "users/signout/pages/{name:string}",
                         "users/{id:number}",
+                        "users/{name:string}",
                         "users/signout/pages/applications"
                     }
                 }
