@@ -13,7 +13,7 @@ namespace EndpointMatcher
 
         public string Match(string route)
         {
-            routes.TryGetValue(route.Split('/')[0], out List<string> routeSubsets);
+            routes.TryGetValue(route.Split('/', 2)[0], out List<string> routeSubsets);
 
             if (routeSubsets.Contains(route))
             {

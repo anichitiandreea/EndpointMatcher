@@ -7,7 +7,7 @@ namespace EndpointMatcher
     {
         static void Main()
         {
-            Dictionary<string, List<string>> routes = new Dictionary<string, List<string>>
+            var routes = new Dictionary<string, List<string>>
             {
                 { "users", new List<string>() { "users/{name}", "users/{id}/applications", "users/{id:number}" } },
                 { "categories", new List<string>() { "categories/{id}/apps/{appId}" } },

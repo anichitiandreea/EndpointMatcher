@@ -1,4 +1,4 @@
-﻿using System;
+﻿using EndpointMatcher.Segment;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,77 +18,41 @@ namespace EndpointMatcher
             return route.Count(character => character == '/');
         }
 
-        public string GetTypeOfSubset(string subsetFromRoute)
-        {
-            if (subsetFromRoute.ToLower() == "true" || subsetFromRoute.ToLower() == "false")
-            {
-                return "bool";
-            }
-
-            var isNumber = decimal.TryParse(subsetFromRoute, out _);
-
-            if (isNumber)
-            {
-                return "number";
-            }
-
-            return "string";
-        }
-
         public string GetSubsetMatchedRoute(string route)
         {
             string[] routeSubsets = route.Split('/');
             int index = 1;
-            var indexOfSpecificity = -1;
             var numberOfRouteLevels = routeSubsets.Length - 1;
 
             while (index < routeSubsets.Length)
             {
-                var primitiveTypeOfSubset = GetTypeOfSubset(routeSubsets[index]);
+                var segmentTypeParser = new SegmentTypeParser(routeSubsets[index]);
+                var routeSegmentType = segmentTypeParser.GetSegmentType();
 
                 for (int i = 0; i < routeValues.Count; i++)
                 {
                     if (GetNumberOfRouteLevels(routeValues[i]) != numberOfRouteLevels)
                     {
-                        routeValues[i] = "-";
+                        routeValues.RemoveAt(i);
                     }
                     else
                     {
-                        var routeValueSubset = routeValues[i].Split('/')[index];
+                        var patternSegment = routeValues[i].Split('/')[index];
+                        var segmentParser = new SegmentParser(patternSegment);
 
-                        if (routeValueSubset.IndexOf("{", 0, StringComparison.Ordinal) < 0
-                            && routeValueSubset.IndexOf("}", 0, StringComparison.Ordinal) < 0
-                            && routeValueSubset != routeSubsets[index])
+                        if (!segmentParser.IsVariable() && patternSegment != routeSubsets[index])
                         {
-                            routeValues[i] = "-";
+                            routeValues.RemoveAt(i);
                         }
 
-                        if (routeValueSubset.IndexOf(":", 0, StringComparison.Ordinal) > 0
-                            && !routeValueSubset.Contains(primitiveTypeOfSubset))
+                        if (!segmentParser.Match(routeSegmentType))
                         {
-                            routeValues[i] = "-";
-                        }
-
-                        if (routeValueSubset.IndexOf(':') > 0 && routeValueSubset.Contains(primitiveTypeOfSubset))
-                        {
-                            if (indexOfSpecificity == -1)
-                            {
-                                indexOfSpecificity = i;
-                            }
-                            else
-                            {
-                                return "many specific routes";
-                            }
+                            routeValues.RemoveAt(i);
                         }
                     }
                 }
 
                 index++;
-            }
-
-            if (indexOfSpecificity != -1)
-            {
-                return routeValues[indexOfSpecificity];
             }
 
             return routeValues.FirstOrDefault(v => v != "-");
