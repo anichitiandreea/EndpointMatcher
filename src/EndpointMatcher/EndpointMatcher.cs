@@ -13,15 +13,15 @@ namespace EndpointMatcher
 
         public string Match(string route)
         {
-            routes.TryGetValue(route.Split('/', 2)[0], out List<string> routeSubsets);
+            routes.TryGetValue(route.Split('/', 2)[0], out List<string> routePatterns);
 
-            if (routeSubsets.Contains(route))
+            if (routePatterns.Contains(route))
             {
                 return route;
             }
 
-            var subsetRouteMatcher = new SubsetRouteMatcher(routeSubsets);
-            string matchedRoute = subsetRouteMatcher.GetSubsetMatchedRoute(route);
+            var routeMatcher = new RouteMatcher(routePatterns, route);
+            string matchedRoute = routeMatcher.GetMatchedRoute();
 
             return matchedRoute;
         }

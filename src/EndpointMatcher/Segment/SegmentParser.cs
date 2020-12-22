@@ -20,6 +20,11 @@ namespace EndpointMatcher.Segment
             isVariable = segment.IndexOf("{", 0, StringComparison.Ordinal) >= 0
                && segment.IndexOf("}", 0, StringComparison.Ordinal) >= 0;
 
+            if (isVariable)
+            {
+                segment = segment[1..^1];
+            }
+
             var values = segment.Split(':');
             hasStrictParameter = values.Length > 1;
 
