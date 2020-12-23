@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using EndpointMatcher.Route;
+using System.Collections.Generic;
 
 namespace EndpointMatcher
 {
@@ -13,7 +14,8 @@ namespace EndpointMatcher
 
         public string Match(string route)
         {
-            routes.TryGetValue(route.Split('/', 2)[0], out List<string> routePatterns);
+            var firstSegment = route.Split('/', 2)[0];
+            routes.TryGetValue(firstSegment, out List<string> routePatterns);
 
             if (routePatterns.Contains(route))
             {
