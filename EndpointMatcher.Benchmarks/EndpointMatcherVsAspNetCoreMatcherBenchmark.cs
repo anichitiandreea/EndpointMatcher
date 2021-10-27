@@ -13,9 +13,29 @@ namespace EndpointMatcher.Benchmarks
         {
             data = new Dictionary<string, List<string>>
             {
-                { "users", new List<string>() { "users/{name}", "users/{id}/applications", "users/{id:number}" } },
-                { "categories", new List<string>() { "categories/{id}/apps/{appId}" } },
-                { "pages", new List<string>() { "pages/{id:number}/sections/myPages", "pages/{id}/sections" } }
+                {
+                    "users",
+                    new List<string>()
+                    {
+                        "users/{name}", "users/{id}/applications",
+                        "users/{id:number}"
+                    }
+                },
+                {
+                    "categories",
+                    new List<string>()
+                    {
+                        "categories/{id}/apps/{appId}"
+                    }
+                },
+                {
+                    "pages",
+                    new List<string>()
+                    {
+                        "pages/{id:number}/sections/myPages",
+                        "pages/{id}/sections"
+                    }
+                }
             };
 
             endpointMatcher = new EndpointMatcher(data);

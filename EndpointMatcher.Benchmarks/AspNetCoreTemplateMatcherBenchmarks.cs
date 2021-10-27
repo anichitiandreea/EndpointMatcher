@@ -10,7 +10,7 @@ namespace EndpointMatcher.Benchmarks
             var template = TemplateParser.Parse(routeTemplate);
             var matcher = new TemplateMatcher(template, GetDefaults(template));
             var values = new RouteValueDictionary();
-            var result = matcher.TryMatch(requestPath, values);
+            matcher.TryMatch(requestPath, values);
 
             return values;
         }
